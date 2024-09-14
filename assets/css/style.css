@@ -9,7 +9,7 @@
 	}
 	html,
 	body {
-		@apply text-base h-full w-full bg-white font-normal;
+		@apply text-base h-full w-full bg-white font-normal bg-[url('/bg.jpg')] inset-0 object-contain bg-no-repeat bg-cover;
 	}
 	p {
 		@apply my-4 text-base font-normal;
@@ -17,5 +17,4 @@
 	#__nuxt {
 		@apply h-full;
 	}
-
 }

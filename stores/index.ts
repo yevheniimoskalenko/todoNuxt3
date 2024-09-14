@@ -1,84 +1,141 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
+import type { Board, Todo } from '@/interfaces/index';
+import { Priorities } from '@/enums/index';
 export const useIndexStore = defineStore('indexStore', () => {
-    const bg = ref('/bg.jpg')
-    const users = ref([])
-    enum Priorities {
-        High = "High",
-        Medium = "Medium",
-        Low ="Low",
-        Urgent = "Urgent",
-        Important = "Important",
-        Critical = "Critical"
-    }
+	const users = ref([
+		{
+			id: 1,
+			name: 'Leanne Graham',
+		},
+		{
+			id: 2,
+			name: 'Ervin Howell',
+		},
+		{
+			id: 3,
+			name: 'Clementine Bauch',
+		},
+		{
+			id: 4,
+			name: 'Patricia Lebsack',
+		},
+	]);
 
-    interface Todo {
-        id: number;
-        title: string;
-        description: string;
-        priority: string;
-    }
+	const tasks = ref<Todo[]>([]);
 
-    interface Board {
-        id: number;
-        title: string;
-        tasks: Todo[];
-    }
+	const boards = ref<Board[]>([
+		{ id: 1, title: 'Todo' },
+		{ id: 2, title: 'In progress' },
+		{ id: 3, title: 'Done' },
+	]);
 
+	const createBoard = (title: string): void => {
+		boards.value.push({
+			id: Date.now(),
+			title,
+		});
+	};
 
-    const boards = ref<Board[]>([
-        { id: 1, title: 'Todo', tasks: [] },
-        { id: 2, title: 'In progress', tasks: [] },
-        { id: 3, title: 'Done', tasks: [] },
-    ])
+	const priorities = computed(() =>
+		Object.values(Priorities).map((i) => {
+			return { label: i, value: i };
+		}),
+	);
 
-    const createBoard = (title: string):void => {
-        boards.value.push({
-            id: Date.now(),
-            title,
-            tasks: []
-        })
-    }
+	const createTask = (
+		id: number,
+		title: string,
+		description: string,
+		priority: Priorities,
+		performers: [object],
+		responsiblePerson: object,
+	): void => {
+		tasks.value.push({
+			id: Date.now(),
+			categoryId: id,
+			title,
+			description,
+			priority,
+			performers,
+			responsiblePerson,
+		});
+	};
 
-    const createTask = (id: number, title: string, description: string, priority: Priorities ) :void => {
-        const findBoard = boards.value.find(b => b.id === id)
-        if (findBoard) {
-            findBoard.tasks.push({
-                id: Date.now(),
-                title,
-                description,
-                priority
-            })
-        } else {
-            // можна зробити логіку, де буде показуватися на клієнті в інтерфейсі
-            console.error('Board not found')
-        }
-    }
+	const editTask = (
+		categoryId: number,
+		title: string,
+		description: string,
+		priority: Priorities,
+		performers: [object],
+		responsiblePerson: object,
+		id: number,
+	): void => {
+		const task = tasks.value.find((t) => t.id == id);
+		if (task) {
+			Object.assign(task, {
+				categoryId: categoryId,
+				title,
+				description,
+				priority,
+				performers,
+				responsiblePerson,
+			});
+		} else {
+			console.error('task not found');
+		}
+	};
 
-        const editTask = (id: number, title: string,taskId: number, description: string, priority: Priorities ) :void => {
-        const findBoard = boards.value.find(b => b.id === id)
-        if (findBoard) {
-            const task = findBoard.tasks.find( t => t.id == taskId)
-            if (task) {
-                Object.assign(task, {
-                title,
-                description,
-                priority
-            })
-            } else {
-                console.error('task not found')
-            }
+	const swipeItemList = (selectCategoryId: number, newCategoryIdPlace: number) => {
+		let indexToMove = boards.value.findIndex((obj) => obj.id === newCategoryIdPlace);
+		let indexToInsertBefore = boards.value.findIndex((obj) => obj.id === selectCategoryId);
+		// Вирізаємо елемент з індексу indexToMove
+		let element = boards.value.splice(indexToMove, 1)[0];
+		// Вставляємо елемент на індекс indexToInsertBefore
+		boards.value.splice(indexToInsertBefore, 0, element);
+	};
 
-        } else {
-            // можна зробити логіку, де буде показуватися на клієнті в інтерфейсі
-            console.error('Board not found')
-        }
-    }
+	const swipeItem = (itemId: number, categoryId: number) => {
+		tasks.value = tasks.value.map((x) => {
+			if (x.categoryId == itemId) x.categoryId = categoryId;
+			return x;
+		});
+	};
 
+	const deleteTask = (id: number) => {
+		tasks.value = tasks.value.filter((task) => task.id !== id);
+	};
 
+	const deleteList = (id: number) => {
+		// remove list
+		boards.value = boards.value.filter((b) => b.id !== id);
+		// remove task
+		tasks.value = tasks.value.filter((task) => task.categoryId !== id);
+	};
 
-    const setBg = (img: File) => {
-        bg.value = URL.createObjectURL(img)
-    }
+	const editList = (title: string, id: number): void => {
+		const board = boards.value.find((t) => t.id == id);
+		if (board) {
+			Object.assign(board, {
+				title,
+			});
+		} else {
+			console.error('board not found');
+		}
+	};
 
-    return { boards, users, createBoard, editTask, Priorities, createTask, bg, setBg }
-})
+	return {
+		boards,
+		users,
+		createBoard,
+		editTask,
+		swipeItemList,
+		Priorities,
+		priorities,
+		createTask,
+		swipeItem,
+		tasks,
+		deleteTask,
+		deleteList,
+		editList,
+	};
+});
