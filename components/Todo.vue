@@ -15,11 +15,9 @@
 				v-for="item in list"
 				:key="item.id"
 				v-bind="item"
-				:categoryId="id"
-				@dragover.stop.prevent
-				@dragenter.stop.prevent
 				draggable="true"
-				@dragstart="onDragStart($event, id)"
+				:categoryId="id"
+				@dragstart="onDragStart($event, item.id)"
 				class="border-b last:border-none py-1"
 			></Item>
 		</main>

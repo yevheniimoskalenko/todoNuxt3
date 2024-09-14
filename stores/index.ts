@@ -85,18 +85,9 @@ export const useIndexStore = defineStore('indexStore', () => {
 		}
 	};
 
-	const swipeItemList = (selectCategoryId: number, newCategoryIdPlace: number) => {
-		let indexToMove = boards.value.findIndex((obj) => obj.id === newCategoryIdPlace);
-		let indexToInsertBefore = boards.value.findIndex((obj) => obj.id === selectCategoryId);
-		// Вирізаємо елемент з індексу indexToMove
-		let element = boards.value.splice(indexToMove, 1)[0];
-		// Вставляємо елемент на індекс indexToInsertBefore
-		boards.value.splice(indexToInsertBefore, 0, element);
-	};
-
 	const swipeItem = (itemId: number, categoryId: number) => {
 		tasks.value = tasks.value.map((x) => {
-			if (x.categoryId == itemId) x.categoryId = categoryId;
+			if (x.id == itemId) x.categoryId = categoryId;
 			return x;
 		});
 	};
@@ -128,7 +119,6 @@ export const useIndexStore = defineStore('indexStore', () => {
 		users,
 		createBoard,
 		editTask,
-		swipeItemList,
 		Priorities,
 		priorities,
 		createTask,

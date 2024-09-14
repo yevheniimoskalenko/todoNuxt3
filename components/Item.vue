@@ -9,6 +9,18 @@
 		</header>
 		<main>
 			<p class="line-clamp-1 text-xs text-gray-400">{{ description }}</p>
+			<span
+				class="rounded-full text-[10px] text-white px-1 py-1"
+				:class="[
+					Priorities[Priorities.High] === priority.value ? ' bg-red-600' : null,
+					Priorities[Priorities.Medium] === priority.value ? ' bg-yellow-600' : null,
+					Priorities[Priorities.Low] === priority.value ? ' bg-green-400' : null,
+					Priorities[Priorities.Urgent] === priority.value ? ' bg-red-800' : null,
+					Priorities[Priorities.Important] === priority.value ? ' bg-emerald-800' : null,
+					Priorities[Priorities.Critical] === priority.value ? ' bg-red-900' : null,
+				]"
+				>{{ priority.label }}</span
+			>
 		</main>
 		<footer>
 			<div class="flex items-center gap-x-2">
@@ -32,10 +44,12 @@
 	</article>
 </template>
 <script setup lang="ts">
+import { Priorities } from '@/enums/index';
 import { useIndexStore } from '@/stores/index';
-const store = useIndexStore();
 import { useModalStore } from '@/stores/modal';
+const store = useIndexStore();
 const storeModal = useModalStore();
+
 const props = defineProps({
 	title: {
 		type: String,
@@ -80,7 +94,6 @@ const options = ref([
 const emitMore = (key: string) => {
 	switch (key) {
 		case 'edit':
-			// store(val);
 			storeModal.showModal({
 				component: 'EditTask',
 				data: { categoryId: props.categoryId, id: props.id, title: 'Редагувати задачу', data: { ...props } },
